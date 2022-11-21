@@ -1,0 +1,175 @@
+# reldi-data
+This repository contains tools and scripts for validating, curating, and maintaining ReLDI datasets.
+
+## Introduction
+After quite some time of struggling with different corpus formats and numerous non-reusable conversion scripts that were difficult to maintain, it has been decided that .conllup will become the main format for all ReLDI corpora. All other formats will be generated from this one as it holds most information. Other formats will not be version-tracked from this point forward.
+
+Unification of the format also allows for generalizing the tools for validating, curating, and maintaining corpora.
+
+Although all ReLDI corpora are version-tracked in separate repositories, this toolset is meant also as an entry point to these corpora. For this reason, all corpora, along with some other useful packages, are included in this repository as [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
+
+## Instalation
+1. Clone this repository
+```
+git clone git@github.com:reldi-data/reldi-data.git
+```
+2. Retrieve all submodules
+```
+git submodule update --remote
+```
+3. Create python 3 based virtualenv or pyenv
+4. Install dependencies
+```
+pip install -r requirements.txt
+```
+
+## Usage
+
+### Generating .conllu from .conllup
+Use `generate_connlu.py`.
+
+```
+(virtualenv) $ python3 generate_conllu.py -h
+usage: CONLLU corpus generator [-h] [-o OUTPUT_FILE]
+                               [-d [DATASETS [DATASETS ...]]]
+                               [-a [ANNOTATIONS [ANNOTATIONS ...]]]
+                               [-m [MISC [MISC ...]]] [--keep-status-metadata]
+                               source
+
+Generates corpus in .conllu format from .conllup source
+
+positional arguments:
+  source                Path to the source file.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUTPUT_FILE        Path to the output file. (default: None)
+  -d [DATASETS [DATASETS ...]], --datasets [DATASETS [DATASETS ...]]
+                        Filter documents by containment in datasets. (default:
+                        [])
+  -a [ANNOTATIONS [ANNOTATIONS ...]], --annotations [ANNOTATIONS [ANNOTATIONS ...]]
+                        Filter documents by level of annotation. (default: [])
+  -m [MISC [MISC ...]], --misc [MISC [MISC ...]]
+                        Transfer data from these columns to MISC. (default:
+                        [])
+  --keep-status-metadata
+                        Write document status metadata to output file.
+                        (default: False)
+```
+
+### Validating .conllup format
+Use `validate_conllup.py`.
+
+```
+(virtualenv) $ python3 validate_conllup.py -h
+usage: CONLLUP corpus validator [-h] [--quiet] [--max-err MAX_ERR] --lang LANG
+                                [--level LEVEL] [--multiple-roots]
+                                [--no-tree-text] [--no-space-after] [--coref]
+                                input
+
+Validates corpus in .conllup
+
+optional arguments:
+  -h, --help         show this help message and exit
+
+Input / output options:
+  --quiet            Do not print any error messages. Exit with 0 on pass,
+                     non-zero on fail. (default: False)
+  --max-err MAX_ERR  How many errors to output before exiting? 0 for all.
+                     Default: 20.
+  input              Path to the source .conllup file.
+
+Tag sets:
+  Options relevant to checking tag sets.
+
+  --lang LANG        Which langauge are we checking? If you specify this (as a
+                     two-letter code), the tags will be checked using the
+                     language-specific files in the data/ directory of the
+                     validator. (default: None)
+  --level LEVEL      Level 1: Test only CoNLL-U backbone. Level 2: UD format.
+                     Level 3: UD contents. Level 4: Language-specific labels.
+                     Level 5: Language-specific contents. (default: 5)
+
+Tree constraints:
+  Options for checking the validity of the tree.
+
+  --multiple-roots   Allow trees with several root words (single root required
+                     by default). (default: True)
+
+Metadata constraints:
+  Options for checking the validity of tree metadata.
+
+  --no-tree-text     Do not test tree text. For internal use only, this test
+                     is required and on by default. (default: True)
+  --no-space-after   Do not test presence of SpaceAfter=No. (default: True)
+
+Coreference / entity constraints:
+  Options for checking coreference and entity annotation.
+
+  --coref            Test coreference and entity-related annotation in MISC.
+                     (default: False)
+```
+
+### Creating the official UD split
+
+```
+$ source make_hr_ud_split.sh
+```
+or
+```
+$ source make_sr_ud_split.sh
+```
+
+### Creating train-dev-test split
+Use `make_train_dev_test_split.py`.
+
+```
+(virtualenv) $ python3 make_train_dev_test_split.py -h
+usage: CONLLUP corpus splitter [-h] [-o OUTPUT_FOLDER] [-f OUTPUT_FILENAME]
+                               [--keep-conllu]
+                               [-a [ANNOTATIONS [ANNOTATIONS ...]]]
+                               [-m [MISC [MISC ...]]] [--keep-status-metadata]
+                               [-t TEST] [-d DEV] [-s SEED]
+                               [--cross-validation]
+                               source
+
+Generates .conllu corpus from .conllup source and splits it reproducibly into
+train, dev and test set.
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Input / output options:
+  source                Path to the source .conllup file.
+  -o OUTPUT_FOLDER      Path to the output folder. (default: None)
+  -f OUTPUT_FILENAME, --output-filename OUTPUT_FILENAME
+                        Specify the filename for output files. (default: None)
+  --keep-conllu         Keep intermediate .conllu file. (default: True)
+
+.conllu generation options:
+  -a [ANNOTATIONS [ANNOTATIONS ...]], --annotations [ANNOTATIONS [ANNOTATIONS ...]]
+                        Filter documents by level of annotation. (default: [])
+  -m [MISC [MISC ...]], --misc [MISC [MISC ...]]
+                        Transfer data from these columns to MISC. (default:
+                        [])
+  --keep-status-metadata
+                        Write document status metadata to output file.
+                        (default: False)
+
+Split options:
+  -t TEST, --test TEST  Test set size. (default: 0.3)
+  -d DEV, --dev DEV     Dev set size. (default: 0.0)
+  -s SEED, --seed SEED  Manually set random seed. (default: None)
+  --cross-validation    Create k-fold cross-validation datasets. (default:
+                        False)
+```
+
+### Creating reproducible train-dev-test corpora split
+
+```
+$ source make_hr500k_split.sh
+```
+or
+```
+$ source make_SETimes.SRPlus_split.sh
+```

@@ -1,0 +1,23 @@
+[submodule "hr500k"]
+	path = hr500k
+	url = https://github.com/reldi-data/hr500k.git
+    branch = master
+[submodule "SETimes.SRPlus"]
+    path = SETimes.SRPlus
+    url = https://github.com/reldi-data/SETimes.SRPlus.git
+    branch = master
+[submodule "reldi-normtagner-hr"]
+    path = reldi-normtagner-hr
+    url = https://github.com/reldi-data/reldi-normtagner-hr.git
+    branch = main
+[submodule "reldi-normtagner-sr"]
+    path = reldi-normtagner-sr
+    url = https://github.com/reldi-data/reldi-normtagner-sr.git
+    branch = main
+[submodule "ud-tools"]
+    path = ud-tools
+    url = https://github.com/UniversalDependencies/tools.git
+	branch = master
+[submodule "conll_corpus_splitter"]
+	path = conll_corpus_splitter
+	url = https://github.com/vstefanec/conll-corpus-splitter.git
