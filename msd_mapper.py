@@ -16,9 +16,9 @@ class MSDMapper:
                 (self.uposudfeat_msd.get('{}|{}'.format(parts[1], parts[3]), set())).add(parts[0])
 
     def map_word(self, surface_form, lemma, msd):
-        mtefeat = self.msd_mtefeat[msd]
-        upos = self.msd_upos[msd]
-        udfeat = self.msd_udfeat[msd]
+        mtefeat = self.msd_mtefeat.get(msd, '_')
+        upos = self.msd_upos.get(msd, '_')
+        udfeat = self.msd_udfeat.get(msd, '_')
 
         # Pronouns and determiners
         if msd.startswith('Pi') and lemma in ('čiji', 'nečiji', 'ničiji', 'svačiji', 'ičiji'):
