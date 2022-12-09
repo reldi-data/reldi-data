@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         prog='CONLLUP tag mapping validator',
-        description='Validates mapping of XPOS to UPOS tags in a CONLLUP corpus.',
+        description='Validates mapping of XPOS to UPOS+Feats tags in a CONLLUP corpus.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('source', help='Path to the source file.')

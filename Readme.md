@@ -23,6 +23,11 @@ git submodule update --remote
 pip install -r requirements.txt
 ```
 
+Periodically check for submodule updates.
+```
+git submodule update --remote
+```
+
 ## Usage
 
 ### Generating .conllu from .conllup
@@ -109,6 +114,47 @@ Coreference / entity constraints:
   --coref            Test coreference and entity-related annotation in MISC.
                      (default: False)
 ```
+
+### Validating XPOS to UPOS+Feats mapping
+Use `check_xpos_upos_feats.py`
+
+```
+(virtualenv) $ python3 check_xpos_upos_feats.py -h
+usage: CONLLUP tag mapping validator [-h] [-o OUTPUT_FILE] source
+
+Validates mapping of XPOS to UPOS+Feats tags in a CONLLUP corpus.
+
+positional arguments:
+  source                Path to the source file.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUTPUT_FILE, --output OUTPUT_FILE
+                        Path to the output file. (default: None)
+
+```
+If the OUTPUT_FILE parameter is not provided, by default the output filename is set to `./<source path>/<source basename>.uposxpos.txt`.
+
+Detected mismatches are printed to stdout so you can pipe the command to `sort` and `uniq -c` to get the aggregated stats.
+
+Mismatches can also be analized in-place by searching for `UPOS!!!` and `XPOS!!!` in the output file.
+
+#### Example
+```
+(virtualenv) $ python3 check_xpos_upos_feats.py SETimes.SRPlus/set.sr.plus.conllup | sort | uniq -c
+     33 UPOS Rgc UposTag=DET|Degree=Cmp
+     31 UPOS Rgp UposTag=DET|Degree=Pos
+      8 UPOS Rgp UposTag=DET|Degree=Pos|PronType=Dem
+     69 UPOS Rgp UposTag=DET|Degree=Pos|PronType=Ind
+      7 UPOS Rgp UposTag=DET|Degree=Pos|PronType=Int,Rel
+      1 UPOS Rgs UposTag=DET|Degree=Sup
+      9 UPOS Y UposTag=ADJ|_
+      7 UPOS Y UposTag=NOUN|_
+      3 UPOS Y UposTag=PART|_
+      4 UPOS Y UposTag=PROPN|_
+      1 UPOS Y UposTag=PUNCT|_
+```
+
 
 ### Creating the official UD split
 
