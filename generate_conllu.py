@@ -55,7 +55,8 @@ class CONLLUToken(namedtuple('CONLLUToken', ['index', 'form', 'lemma', 'upos', '
         return CONLLUToken(*token[:10])
 
 
-def generate(input_stream, output_stream, datasets=[], annotations=[], misc=[], keep_status=False):
+def generate(input_stream, output_stream, datasets=[], omit_datasets=[], annotations=[], omit_annotations=[],
+             misc=[], keep_status=False):
 
     flush = False
     read_buffer = StringIO()
@@ -67,18 +68,21 @@ def generate(input_stream, output_stream, datasets=[], annotations=[], misc=[], 
         if line.startswith('# newdoc'):
             flush = False
             read_buffer = StringIO()
-            if datasets or annotations:
+            if any([datasets, omit_datasets, annotations, omit_annotations]):
                 read_buffer.write(line)
             else:
                 output_stream.write(line)
 
         elif line.startswith('# contained_in_datasets'):
-            if datasets:
-                datasets = DATASETS_RE.search(line).group(0).split(';')
-                if not set(datasets).intersection(datasets):
+            if datasets or omit_datasets:
+                doc_datasets = DATASETS_RE.search(line).group(0).split(';')
+                if omit_datasets and set(doc_datasets).intersection(omit_datasets):
                     flush = True
                     continue
-                if annotations:
+                if datasets and not set(doc_datasets).intersection(datasets):
+                    flush = True
+                    continue
+                if annotations or omit_annotations:
                     if keep_status:
                         read_buffer.write(line)
                 else:
@@ -93,9 +97,12 @@ def generate(input_stream, output_stream, datasets=[], annotations=[], misc=[], 
                     output_stream.write(line)
 
         elif line.startswith('# annotation_levels'):
-            if annotations:
-                annotations = ANNOTATIONS_RE.search(line).group(0).split(';')
-                if not all([a in annotations for a in annotations]):
+            if annotations or omit_annotations:
+                doc_annotations = ANNOTATIONS_RE.search(line).group(0).split(';')
+                if omit_annotations and any([a in doc_annotations for a in omit_annotations]):
+                    flush = True
+                    continue
+                if annotations and not all([a in doc_annotations for a in annotations]):
                     flush = True
                     continue
                 output_stream.write(read_buffer.getvalue())
@@ -123,10 +130,12 @@ def generate(input_stream, output_stream, datasets=[], annotations=[], misc=[], 
 def main(args):
     output_file = args.output_file or '{}.conllu'.format(os.path.splitext(args.source)[0])
     datasets = set(args.datasets)
+    omit_datasets = set(args.omit_datasets)
     annotations = set(args.annotations)
+    omit_annotations = set(args.omit_annotations)
 
     with open(args.source, 'r') as infile, open(output_file, 'w') as outfile:
-        generate(infile, outfile, datasets, annotations, args.misc, args.keep_status)
+        generate(infile, outfile, datasets, omit_datasets, annotations, omit_annotations, args.misc, args.keep_status)
 
 
 if __name__ == '__main__':
@@ -140,8 +149,12 @@ if __name__ == '__main__':
     parser.add_argument('-o', dest='output_file', help='Path to the output file.')
     parser.add_argument('-d', '--datasets', type=str, nargs='*', default=[],
                         help='Filter documents by containment in datasets.')
+    parser.add_argument('-t', '--omit-datasets', type=str, nargs='*', default=[],
+                        help='Filter documents by not being contained in datasets.')
     parser.add_argument('-a', '--annotations', type=str, nargs='*', default=[],
                         help='Filter documents by level of annotation.')
+    parser.add_argument('-n', '--omit-annotations', type=str, nargs='*', default=[],
+                        help='Filter documents by not having certain level of annotation.')
     parser.add_argument('-m', '--misc', type=str, nargs='*', default=[],
                         help='Transfer data from these columns to MISC.')
     parser.add_argument('--keep-status-metadata', dest='keep_status', action='store_true',

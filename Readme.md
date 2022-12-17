@@ -37,7 +37,9 @@ Use `generate_connlu.py`.
 (virtualenv) $ python3 generate_conllu.py -h
 usage: CONLLU corpus generator [-h] [-o OUTPUT_FILE]
                                [-d [DATASETS [DATASETS ...]]]
+                               [-t [OMIT_DATASETS [OMIT_DATASETS ...]]]
                                [-a [ANNOTATIONS [ANNOTATIONS ...]]]
+                               [-n [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]]]
                                [-m [MISC [MISC ...]]] [--keep-status-metadata]
                                source
 
@@ -52,8 +54,14 @@ optional arguments:
   -d [DATASETS [DATASETS ...]], --datasets [DATASETS [DATASETS ...]]
                         Filter documents by containment in datasets. (default:
                         [])
+  -t [OMIT_DATASETS [OMIT_DATASETS ...]], --omit-datasets [OMIT_DATASETS [OMIT_DATASETS ...]]
+                        Filter documents by not being contained in datasets.
+                        (default: [])
   -a [ANNOTATIONS [ANNOTATIONS ...]], --annotations [ANNOTATIONS [ANNOTATIONS ...]]
                         Filter documents by level of annotation. (default: [])
+  -n [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]], --omit-annotations [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]]
+                        Filter documents by not having certain level of
+                        annotation. (default: [])
   -m [MISC [MISC ...]], --misc [MISC [MISC ...]]
                         Transfer data from these columns to MISC. (default:
                         [])
@@ -166,14 +174,16 @@ or
 $ source make_sr_ud_split.sh
 ```
 
-### Creating train-dev-test split
+### Creating arbitrary train-dev-test split
 Use `make_train_dev_test_split.py`.
 
 ```
 (virtualenv) $ python3 make_train_dev_test_split.py -h
 usage: CONLLUP corpus splitter [-h] [-o OUTPUT_FOLDER] [-f OUTPUT_FILENAME]
-                               [--keep-conllu]
+                               [--keep-conllu] [-e [DATASETS [DATASETS ...]]]
+                               [-i [OMIT_DATASETS [OMIT_DATASETS ...]]]
                                [-a [ANNOTATIONS [ANNOTATIONS ...]]]
+                               [-n [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]]]
                                [-m [MISC [MISC ...]]] [--keep-status-metadata]
                                [-t TEST] [-d DEV] [-s SEED]
                                [--cross-validation]
@@ -193,8 +203,17 @@ Input / output options:
   --keep-conllu         Keep intermediate .conllu file. (default: True)
 
 .conllu generation options:
+  -e [DATASETS [DATASETS ...]], --datasets [DATASETS [DATASETS ...]]
+                        Filter documents by containment in datasets. (default:
+                        [])
+  -i [OMIT_DATASETS [OMIT_DATASETS ...]], --omit-datasets [OMIT_DATASETS [OMIT_DATASETS ...]]
+                        Filter documents by not being contained in datasets.
+                        (default: [])
   -a [ANNOTATIONS [ANNOTATIONS ...]], --annotations [ANNOTATIONS [ANNOTATIONS ...]]
                         Filter documents by level of annotation. (default: [])
+  -n [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]], --omit-annotations [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]]
+                        Filter documents by not having certain level of
+                        annotation. (default: [])
   -m [MISC [MISC ...]], --misc [MISC [MISC ...]]
                         Transfer data from these columns to MISC. (default:
                         [])

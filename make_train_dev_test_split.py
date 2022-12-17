@@ -46,10 +46,14 @@ def main(args):
     if args.keep_conllu:
         intermediate_filename = '{}.conllu'.format(os.path.splitext(args.source)[0])
 
+    datasets = set(args.datasets)
+    omit_datasets = set(args.omit_datasets)
     annotations = set(args.annotations)
+    omit_annotations = set(args.omit_annotations)
 
     with open(args.source, 'r') as infile, open(intermediate_filename, 'w') as outfile:
-        generate(infile, outfile, annotations=annotations, misc=args.misc, keep_status=args.keep_status)
+        generate(infile, outfile, datasets=datasets, omit_datasets=omit_datasets, annotations=annotations,
+                 omit_annotations=omit_annotations, misc=args.misc, keep_status=args.keep_status)
 
     output_folder = args.output_folder or os.getcwd()
     split_corpus(intermediate_filename, output_folder=output_folder, test=args.test, dev=args.dev,
@@ -74,8 +78,14 @@ if __name__ == '__main__':
                           help='Keep intermediate .conllu file.')
 
     generate_group = parser.add_argument_group(".conllu generation options")
+    generate_group.add_argument('-e', '--datasets', type=str, nargs='*', default=[],
+                                help='Filter documents by containment in datasets.')
+    generate_group.add_argument('-i', '--omit-datasets', type=str, nargs='*', default=[],
+                                help='Filter documents by not being contained in datasets.')
     generate_group.add_argument('-a', '--annotations', type=str, nargs='*', default=[],
                                 help='Filter documents by level of annotation.')
+    generate_group.add_argument('-n', '--omit-annotations', type=str, nargs='*', default=[],
+                                help='Filter documents by not having certain level of annotation.')
     generate_group.add_argument('-m', '--misc', type=str, nargs='*', default=[],
                                 help='Transfer data from these columns to MISC.')
     generate_group.add_argument('--keep-status-metadata', dest='keep_status', action='store_true',

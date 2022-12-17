@@ -1,3 +1,5 @@
 #!/bin/bash
 
-python3 make_train_dev_test_split.py SETimes.SRPlus/set.sr.plus.conllup -o SETimes.SRPlus -a UD -t 0.2 -d 0.1 -s 27
+python3 generate_conllu.py SETimes.SRPlus/set.sr.plus.conllup -o SETimes.SRPlus/set.sr.plus-train.conllu -d set.sr.plus-train
+python3 generate_conllu.py SETimes.SRPlus/set.sr.plus.conllup -o SETimes.SRPlus/set.sr.plus-dev.conllu -d set.sr.plus-dev
+python3 generate_conllu.py SETimes.SRPlus/set.sr.plus.conllup -o SETimes.SRPlus/set.sr.plus-test.conllu -d set.sr.plus-test
