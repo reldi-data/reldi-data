@@ -31,7 +31,7 @@ git submodule update --remote
 ## Usage
 
 ### Generating .conllu from .conllup
-Use `generate_connlu.py`.
+Use `generate_conllu.py`.
 
 ```
 (virtualenv) $ python3 generate_conllu.py -h
