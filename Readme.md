@@ -238,3 +238,11 @@ or
 ```
 $ source make_SETimes.SRPlus_split.sh
 ```
+or
+```
+make_reldi-normtagner-hr_split.sh
+```
+or
+```
+make_reldi-normtagner-sr_split.sh
+```
