@@ -15,8 +15,10 @@ git clone git@github.com:reldi-data/reldi-data.git
 ```
 2. Retrieve all submodules
 ```
-git submodule update --remote
+git submodule init
+git submodule update
 ```
+
 3. Create python 3 based virtualenv or pyenv
 4. Install dependencies
 ```
