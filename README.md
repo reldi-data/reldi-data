@@ -125,6 +125,24 @@ Coreference / entity constraints:
                      (default: False)
 ```
 
+### Validating .conllup format of ReLDI corpora using predefined and currently appropriate settings
+```
+$ source validate_SETimes.SRPlus.sh
+```
+or
+```
+$ source validate_hr500k.sh
+```
+or
+```
+$ source validate_reldi-normtagner-hr.sh
+```
+or
+```
+$ source validate_reldi-normtagner-sr.sh
+```
+Compare validation results with README.validation.md files in respective corpus repositories.
+
 ### Validating XPOS to UPOS+Feats mapping
 Use `check_xpos_upos_feats.py`
 
@@ -146,6 +164,8 @@ optional arguments:
 If the OUTPUT_FILE parameter is not provided, by default the output filename is set to `./<source path>/<source basename>.uposxpos.txt`.
 
 Detected mismatches are printed to stdout so you can pipe the command to `sort` and `uniq -c` to get the aggregated stats.
+
+Compare aggregated validation results with README.validation.md files in respective corpus repositories.
 
 Mismatches can also be analized in-place by searching for `UPOS!!!` and `XPOS!!!` in the output file.
 
@@ -242,9 +262,9 @@ $ source make_SETimes.SRPlus_split.sh
 ```
 or
 ```
-make_reldi-normtagner-hr_split.sh
+$ source make_reldi-normtagner-hr_split.sh
 ```
 or
 ```
-make_reldi-normtagner-sr_split.sh
+$ source make_reldi-normtagner-sr_split.sh
 ```
