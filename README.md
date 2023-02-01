@@ -42,7 +42,8 @@ usage: CONLLU corpus generator [-h] [-o OUTPUT_FILE]
                                [-t [OMIT_DATASETS [OMIT_DATASETS ...]]]
                                [-a [ANNOTATIONS [ANNOTATIONS ...]]]
                                [-n [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]]]
-                               [-m [MISC [MISC ...]]] [--keep-status-metadata]
+                               [-m [{NE,DP,SRL,PARSEME,RMISC} [{NE,DP,SRL,PARSEME,RMISC} ...]]]
+                               [--keep-status-metadata]
                                source
 
 Generates corpus in .conllu format from .conllup source
@@ -64,7 +65,7 @@ optional arguments:
   -n [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]], --omit-annotations [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]]
                         Filter documents by not having certain level of
                         annotation. (default: [])
-  -m [MISC [MISC ...]], --misc [MISC [MISC ...]]
+  -m [{NE,DP,SRL,PARSEME,RMISC} [{NE,DP,SRL,PARSEME,RMISC} ...]], --misc [{NE,DP,SRL,PARSEME,RMISC} [{NE,DP,SRL,PARSEME,RMISC} ...]]
                         Transfer data from these columns to MISC. (default:
                         [])
   --keep-status-metadata
@@ -206,9 +207,9 @@ usage: CONLLUP corpus splitter [-h] [-o OUTPUT_FOLDER] [-f OUTPUT_FILENAME]
                                [-i [OMIT_DATASETS [OMIT_DATASETS ...]]]
                                [-a [ANNOTATIONS [ANNOTATIONS ...]]]
                                [-n [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]]]
-                               [-m [MISC [MISC ...]]] [--keep-status-metadata]
-                               [-t TEST] [-d DEV] [-s SEED]
-                               [--cross-validation]
+                               [-m [{NE,DP,SRL,PARSEME,RMISC} [{NE,DP,SRL,PARSEME,RMISC} ...]]]
+                               [--keep-status-metadata] [-t TEST] [-d DEV]
+                               [-s SEED] [--cross-validation]
                                source
 
 Generates .conllu corpus from .conllup source and splits it reproducibly into
@@ -236,7 +237,7 @@ Input / output options:
   -n [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]], --omit-annotations [OMIT_ANNOTATIONS [OMIT_ANNOTATIONS ...]]
                         Filter documents by not having certain level of
                         annotation. (default: [])
-  -m [MISC [MISC ...]], --misc [MISC [MISC ...]]
+  -m [{NE,DP,SRL,PARSEME,RMISC} [{NE,DP,SRL,PARSEME,RMISC} ...]], --misc [{NE,DP,SRL,PARSEME,RMISC} [{NE,DP,SRL,PARSEME,RMISC} ...]]
                         Transfer data from these columns to MISC. (default:
                         [])
   --keep-status-metadata

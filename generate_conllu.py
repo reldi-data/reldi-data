@@ -14,22 +14,30 @@ CORPUS_NULL_VALUES = ['_', '*']
 ReadingMode = Enum('ReadingMode', ['DOCUMENT', 'SENTENCE'])
 
 
+class InvalidCONLLUPToken(TypeError):
+    pass
+
+
 class CONLLUPToken(namedtuple('CONLLUPToken', ['index', 'form', 'lemma', 'upos', 'msd', 'upos_feats', 'head', 'deprel',
-                                               'deps', 'misc', 'ne', 'dp', 'srl', 'rmisc'])):
+                                               'deps', 'misc', 'ne', 'dp', 'srl', 'parseme_mwe', 'rmisc'])):
     @staticmethod
     def create_from_conllup_line(line):
         line = line.split('\t')
+
+        if len(line) != 15:
+            raise InvalidCONLLUPToken("Invalid token. Expected 15 columns, got {}.".format(str(len(line))))
+
         if line[9] == '_':
             misc = []
         else:
             misc = line[9].split('|')
         misc = OrderedDict([tuple(v.split('=')) for v in misc])
-        if line[13] == '_':
+        if line[14] == '_':
             rmisc = []
         else:
-            rmisc = line[13].split('|')
+            rmisc = line[14].split('|')
         rmisc = OrderedDict([tuple(v.split('=')) for v in rmisc])
-        return CONLLUPToken(*line[:9], misc, *line[10:13], rmisc)
+        return CONLLUPToken(*line[:9], misc, *line[10:14], rmisc)
 
 
 class CONLLUToken(namedtuple('CONLLUToken', ['index', 'form', 'lemma', 'upos', 'msd', 'upos_feats', 'head', 'deprel',
@@ -51,6 +59,9 @@ class CONLLUToken(namedtuple('CONLLUToken', ['index', 'form', 'lemma', 'upos', '
         if 'SRL' in transfers and token.srl not in CORPUS_NULL_VALUES:
             token.misc.update({'SRL': token.srl})
 
+        if 'PARSEME' in transfers and token.parseme_mwe not in CORPUS_NULL_VALUES:
+            token.misc.update({'PARSEME': token.parseme_mwe})
+
         if 'RMISC' in transfers:
             token.misc.update(token.rmisc)
 
@@ -60,9 +71,14 @@ class CONLLUToken(namedtuple('CONLLUToken', ['index', 'form', 'lemma', 'upos', '
 def generate(input_stream, output_stream, datasets=[], omit_datasets=[], annotations=[], omit_annotations=[],
              misc=[], keep_status=False):
 
+    line_no = 0
+
     def consume_till_end(*end_marks, flush=False):
+        nonlocal line_no
+
         while True:
             line = input_stream.readline()
+            line_no += 1
 
             if not line or any([line.startswith(end_mark) for end_mark in end_marks]):
                 break
@@ -78,12 +94,15 @@ def generate(input_stream, output_stream, datasets=[], omit_datasets=[], annotat
                 output_stream.write(line)
 
             else:
-                output_stream.write(
-                    CONLLUToken.create_from_conllup_token(
-                        CONLLUPToken.create_from_conllup_line(line.strip()),
-                        misc
-                    ).to_conllu_line()
-                )
+                try:
+                    output_stream.write(
+                        CONLLUToken.create_from_conllup_token(
+                            CONLLUPToken.create_from_conllup_line(line.strip()),
+                            misc
+                        ).to_conllu_line()
+                    )
+                except InvalidCONLLUPToken as e:
+                    raise TypeError('Line number {}: {}'.format(line_no, str(e)))
 
         return line
 
@@ -92,6 +111,7 @@ def generate(input_stream, output_stream, datasets=[], omit_datasets=[], annotat
     reading_mode = ReadingMode.DOCUMENT
 
     line = input_stream.readline()
+    line_no += 1
 
     while True:
 
@@ -100,6 +120,7 @@ def generate(input_stream, output_stream, datasets=[], omit_datasets=[], annotat
 
         if line.startswith('# global.columns'):
             line = input_stream.readline()
+            line_no += 1
             continue
 
         if line.startswith('# newdoc'):
@@ -161,7 +182,7 @@ def generate(input_stream, output_stream, datasets=[], omit_datasets=[], annotat
                             continue
 
                 elif annotations or omit_annotations:
-                    # there are annotations-related limitations, buffet and wait
+                    # there are annotations-related limitations, buffer and wait
                     if keep_status:
                         read_buffer.write(line)
                 else:
@@ -230,14 +251,18 @@ def generate(input_stream, output_stream, datasets=[], omit_datasets=[], annotat
 
         else:
             # shouldn't end up here
-            output_stream.write(
-                CONLLUToken.create_from_conllup_token(
-                    CONLLUPToken.create_from_conllup_line(line.strip()),
-                    misc
-                ).to_conllu_line()
-            )
+            try:
+                output_stream.write(
+                    CONLLUToken.create_from_conllup_token(
+                        CONLLUPToken.create_from_conllup_line(line.strip()),
+                        misc
+                    ).to_conllu_line()
+                )
+            except InvalidCONLLUPToken as e:
+                raise TypeError('Line number {}: {}'.format(line_no, str(e)))
 
         line = input_stream.readline()
+        line_no += 1
 
 
 def main(args):
@@ -269,6 +294,7 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--omit-annotations', type=str, nargs='*', default=[],
                         help='Filter documents by not having certain level of annotation.')
     parser.add_argument('-m', '--misc', type=str, nargs='*', default=[],
+                        choices=['NE', 'DP', 'SRL', 'PARSEME', 'RMISC'],
                         help='Transfer data from these columns to MISC.')
     parser.add_argument('--keep-status-metadata', dest='keep_status', action='store_true',
                         help='Write document status metadata to output file.')

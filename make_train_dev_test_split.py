@@ -87,6 +87,7 @@ if __name__ == '__main__':
     generate_group.add_argument('-n', '--omit-annotations', type=str, nargs='*', default=[],
                                 help='Filter documents by not having certain level of annotation.')
     generate_group.add_argument('-m', '--misc', type=str, nargs='*', default=[],
+                                choices=['NE', 'DP', 'SRL', 'PARSEME', 'RMISC'],
                                 help='Transfer data from these columns to MISC.')
     generate_group.add_argument('--keep-status-metadata', dest='keep_status', action='store_true',
                                 help='Write document status metadata to output file.')
