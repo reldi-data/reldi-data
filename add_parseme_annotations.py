@@ -62,10 +62,44 @@ def add_annotations(input_stream, output_stream, annotation_data):
             sentence.append(CONLLUPToken.create_from_conllup_line(line.strip()))
 
 
+def test_annotations(input_stream, annotation_data):
+
+    current_sentence_id = None
+    sentence = []
+
+    for line in input_stream:
+        if line.startswith('# sent_id'):
+            current_sentence_id = SENTENCE_ID_RE.search(line).group(0)
+
+        elif line.startswith('# '):
+            continue
+
+        elif not line.strip():
+            if current_sentence_id in annotation_data:
+                current_sentence_annotations = {a[0]: a[1:] for a in annotation_data[current_sentence_id]['annotations']}
+                for token in sentence:
+                    if token.index in current_sentence_annotations:
+                        if token.form != current_sentence_annotations[token.index][0]:
+                            print("Sentence {}. Token mismatch. Expected {}, found {}.".format(
+                                current_sentence_id,
+                                current_sentence_annotations[token.index][0],
+                                token.form
+                            ))
+            current_sentence_id = None
+            sentence = []
+
+        else:
+            sentence.append(CONLLUPToken.create_from_conllup_line(line.strip()))
+
+
 def main(args):
     annotation_data = json.loads(open(args.annotation_data, 'r').read())
-    with open(args.source, 'r') as infile, open(args.output_file, 'w') as outfile:
-        add_annotations(infile, outfile, annotation_data)
+    if args.test:
+        with open(args.source, 'r') as infile:
+                test_annotations(infile, annotation_data)
+    else:
+        with open(args.source, 'r') as infile, open(args.output_file, 'w') as outfile:
+            add_annotations(infile, outfile, annotation_data)
 
 
 if __name__ == '__main__':
@@ -78,5 +112,7 @@ if __name__ == '__main__':
     parser.add_argument('source', help='Path to the source file.')
     parser.add_argument('annotation_data', help='Path to the annotation data .json file.')
     parser.add_argument('-o', dest='output_file', help='Path to the output file.')
+    parser.add_argument('--test', dest='test', action='store_true',
+                        help='Test the annotations.')
     args = parser.parse_args()
     main(args)
