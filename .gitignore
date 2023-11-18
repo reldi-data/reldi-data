@@ -1,4 +1,5 @@
 *.conllu
+*.old
 private_*
 
 __pycache__/
