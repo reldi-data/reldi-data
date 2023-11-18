@@ -269,3 +269,98 @@ or
 ```
 $ source make_reldi-normtagner-sr_split.sh
 ```
+
+### Adding parseme annotations from an external .json file
+Use `add_parseme_annotations.py`.
+
+```
+(virtualenv) $ python3 add_parseme_annotations.py -h
+usage: PARSEME:MWE to CONLLUP file [-h] [-o OUTPUT_FILE] [--test]
+                                   source annotation_data
+
+Adds PARSEME:MWE annotations to CONLLUP file
+
+positional arguments:
+  source           Path to the source file.
+  annotation_data  Path to the annotation data .json file.
+
+optional arguments:
+  -h, --help       show this help message and exit
+  -o OUTPUT_FILE   Path to the output file. (default: None)
+  --test           Test the annotations. (default: False)
+```
+
+Format of the .json file containing annotation data should be as follows:
+```
+{
+  <sentence_id>: {
+    "annotations": [
+      [
+        <token_id>,
+        <token_text>,
+        <parseme_annotation>
+      ],
+      ...
+      [
+        <token_id>,
+        <token_text>,
+        <parseme_annotation>
+      ]
+    ],
+    "text": <sentence_text>
+  },
+  ...
+  <sentence_id>: {
+    "annotations": [
+      [
+        <token_id>,
+        <token_text>,
+        <parseme_annotation>
+      ],
+      ...
+      [
+        <token_id>,
+        <token_text>,
+        <parseme_annotation>
+      ]
+    ],
+    "text": <sentence_text>
+  }
+}
+```
+
+For example:
+```
+{
+  "set.hr-s3024": {
+    "annotations": [
+      [
+        "5",
+        "podnio",
+        "1:LVC.full"
+      ],
+      [
+        "6",
+        "ostavku",
+        "1"
+      ]
+    ],
+    "text": "\"Kada bih danas podnio ostavku to bi bio znak slabosti\"."
+  },
+  "set.hr-s3030": {
+    "annotations": [
+      [
+        "8",
+        "podnijeti",
+        "1:LVC.full"
+      ],
+      [
+        "9",
+        "ostavku",
+        "1"
+      ]
+    ],
+    "text": "Očekivalo se kako će Tariceanu u utorak podnijeti ostavku, nakon posjeta Bruxellesu prethodnog dana."
+  }
+}
+```
